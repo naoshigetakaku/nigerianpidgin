@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naija Pidgin – Learn am Now!</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00c853;
+    --white: #008751;
+    --naija-green: #009a3b;
+    --naija-white: #f5f5f5;
+    --naija-black: #1a1a1a;
+    --gold: #ffd700;
+    --text: #0d0d0d;
+    --card-bg: #fff;
+    --muted: #888;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: ‘Syne’, sans-serif;
+background: var(–naija-black);
+color: var(–naija-white);
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* Animated Nigerian flag stripe background */
+.bg-stripes {
+position: fixed; inset: 0; z-index: 0;
+background: repeating-linear-gradient(
+-55deg,
+#009a3b08 0px, #009a3b08 2px,
+transparent 2px, transparent 28px
+);
+pointer-events: none;
+}
+
+header {
+position: relative; z-index: 10;
+padding: 2rem 1.5rem 1rem;
+text-align: center;
+border-bottom: 3px solid var(–naija-green);
+}
+
+.flag-bar {
+display: flex; height: 6px; border-radius: 3px; overflow: hidden; max-width: 200px; margin: 0 auto 1.2rem;
+}
+.flag-bar div { flex: 1; }
+.flag-bar .g { background: #009a3b; }
+.flag-bar .w { background: #f5f5f5; }
+
+header h1 {
+font-size: clamp(2rem, 8vw, 3.5rem);
+font-weight: 800;
+color: var(–naija-white);
+letter-spacing: -1px;
+line-height: 1;
+}
+header h1 span { color: var(–naija-green); }
+header p {
+margin-top: .5rem;
+color: #aaa;
+font-size: .95rem;
+font-family: ‘Fira Code’, monospace;
+}
+
+/* Tab nav */
+nav {
+display: flex; gap: .5rem; padding: 1rem 1rem .5rem;
+overflow-x: auto; position: relative; z-index: 10;
+scrollbar-width: none;
+}
+nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+flex-shrink: 0;
+padding: .5rem 1.1rem;
+border-radius: 999px;
+border: 2px solid #333;
+background: transparent;
+color: #aaa;
+font-family: ‘Syne’, sans-serif;
+font-size: .85rem;
+font-weight: 700;
+cursor: pointer;
+transition: all .2s;
+}
+.tab-btn.active {
+background: var(–naija-green);
+border-color: var(–naija-green);
+color: #fff;
+}
+
+main {
+position: relative; z-index: 10;
+padding: 1rem 1rem 4rem;
+max-width: 640px; margin: 0 auto;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── PHRASES ── */
+.section-title {
+font-size: 1.3rem; font-weight: 800;
+margin-bottom: 1rem;
+color: var(–naija-green);
+display: flex; align-items: center; gap: .5rem;
+}
+
+.phrase-card {
+background: #1e1e1e;
+border: 1px solid #2e2e2e;
+border-left: 4px solid var(–naija-green);
+border-radius: 12px;
+padding: 1rem 1.2rem;
+margin-bottom: .8rem;
+cursor: pointer;
+transition: border-color .2s, transform .15s;
+position: relative;
+}
+.phrase-card:active { transform: scale(.98); }
+.phrase-card.flip { border-left-color: var(–gold); }
+
+.pidgin-text {
+font-size: 1.3rem; font-weight: 800; color: #fff;
+}
+.english-text {
+font-size: .9rem; color: #aaa; margin-top: .3rem;
+font-family: ‘Fira Code’, monospace;
+}
+.notes-text {
+font-size: .8rem; color: var(–naija-green);
+margin-top: .4rem; display: none;
+font-style: italic;
+}
+.phrase-card.flip .notes-text { display: block; }
+.tap-hint {
+position: absolute; top: .8rem; right: 1rem;
+font-size: .7rem; color: #444; font-family: ‘Fira Code’, monospace;
+}
+
+/* category filter */
+.cat-row {
+display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem;
+}
+.cat-btn {
+padding: .35rem .8rem; border-radius: 999px;
+border: 1px solid #333; background: transparent;
+color: #888; font-size: .78rem; font-family: ‘Syne’, sans-serif;
+font-weight: 700; cursor: pointer; transition: all .2s;
+}
+.cat-btn.active { background: #009a3b22; border-color: var(–naija-green); color: var(–naija-green); }
+
+/* ── QUIZ ── */
+.quiz-score {
+font-family: ‘Fira Code’, monospace;
+font-size: .85rem; color: #aaa;
+margin-bottom: 1rem;
+text-align: right;
+}
+.quiz-score span { color: var(–gold); font-weight: 700; }
+
+.quiz-question {
+background: #1e1e1e; border: 1px solid #2e2e2e;
+border-radius: 16px; padding: 1.5rem;
+margin-bottom: 1rem; text-align: center;
+}
+.quiz-prompt { font-size: .8rem; color: #666; font-family: ‘Fira Code’, monospace; margin-bottom: .5rem; }
+.quiz-word { font-size: 2rem; font-weight: 800; color: #fff; }
+.quiz-sub { font-size: .85rem; color: #777; margin-top: .3rem; }
+
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.quiz-opt {
+padding: .9rem; border-radius: 12px;
+border: 2px solid #2e2e2e; background: #1a1a1a;
+color: #ddd; font-family: ‘Syne’, sans-serif;
+font-size: .9rem; font-weight: 700;
+cursor: pointer; transition: all .2s; text-align: center;
+}
+.quiz-opt:hover { border-color: #555; }
+.quiz-opt.correct { border-color: var(–naija-green); background: #009a3b22; color: var(–naija-green); }
+.quiz-opt.wrong { border-color: #e53935; background: #e5393522; color: #e53935; }
+.quiz-opt:disabled { cursor: not-allowed; }
+
+.quiz-feedback {
+text-align: center; padding: 1rem;
+font-size: 1rem; font-weight: 700;
+min-height: 60px;
+}
+.quiz-feedback.correct-fb { color: var(–naija-green); }
+.quiz-feedback.wrong-fb { color: #e53935; }
+
+.next-btn {
+display: block; width: 100%; padding: .9rem;
+background: var(–naija-green); color: #fff;
+border: none; border-radius: 12px;
+font-family: ‘Syne’, sans-serif; font-size: 1rem;
+font-weight: 800; cursor: pointer; margin-top: .5rem;
+transition: opacity .2s;
+}
+.next-btn:hover { opacity: .85; }
+
+/* ── GRAMMAR ── */
+.grammar-block {
+background: #1e1e1e; border: 1px solid #2e2e2e;
+border-radius: 12px; padding: 1.2rem;
+margin-bottom: 1rem;
+}
+.grammar-block h3 {
+font-size: 1rem; color: var(–gold);
+margin-bottom: .6rem; font-weight: 700;
+}
+.grammar-block p { font-size: .9rem; color: #bbb; line-height: 1.6; }
+.example-row {
+display: flex; gap: .8rem; align-items: flex-start;
+margin-top: .7rem; padding-top: .7rem;
+border-top: 1px solid #2e2e2e;
+}
+.ex-label {
+font-size: .7rem; font-family: ‘Fira Code’, monospace;
+color: var(–naija-green); min-width: 40px; padding-top: 2px;
+}
+.ex-text { font-size: .88rem; color: #ddd; }
+.ex-en { font-size: .8rem; color: #666; font-style: italic; }
+
+/* ── CULTURE ── */
+.culture-card {
+background: linear-gradient(135deg, #1e1e1e 0%, #141414 100%);
+border: 1px solid #2e2e2e;
+border-radius: 16px; padding: 1.3rem;
+margin-bottom: .8rem;
+}
+.culture-card .emoji { font-size: 2rem; margin-bottom: .5rem; }
+.culture-card h3 { font-size: 1rem; color: #fff; margin-bottom: .4rem; }
+.culture-card p { font-size: .87rem; color: #999; line-height: 1.6; }
+.culture-example {
+margin-top: .8rem; padding: .7rem;
+background: #0d0d0d; border-radius: 8px;
+font-family: ‘Fira Code’, monospace;
+font-size: .82rem; color: var(–naija-green);
+}
+
+/* footer */
+footer {
+text-align: center; padding: 1.5rem;
+color: #333; font-size: .75rem;
+font-family: ‘Fira Code’, monospace;
+position: relative; z-index: 10;
+}
+</style>
+
+</head>
+<body>
+<div class="bg-stripes"></div>
+
+<header>
+  <div class="flag-bar"><div class="g"></div><div class="w"></div><div class="g"></div></div>
+  <h1>Learn <span>Naija</span> Pidgin</h1>
+  <p>// over 75 million speakers · West Africa's lingua franca</p>
+</header>
+
+<nav>
+  <button class="tab-btn active" onclick="showTab('phrases')">📗 Phrases</button>
+  <button class="tab-btn" onclick="showTab('quiz')">🎯 Quiz</button>
+  <button class="tab-btn" onclick="showTab('grammar')">📐 Grammar</button>
+  <button class="tab-btn" onclick="showTab('culture')">🎺 Culture</button>
+</nav>
+
+<main>
+
+  <!-- PHRASES -->
+
+  <section id="phrases" class="section active">
+    <div class="cat-row" id="catRow"></div>
+    <div id="phraseList"></div>
+  </section>
+
+  <!-- QUIZ -->
+
+  <section id="quiz" class="section">
+    <div class="quiz-score">Score: <span id="scoreDisplay">0</span> / <span id="totalDisplay">0</span></div>
+    <div class="quiz-question">
+      <div class="quiz-prompt" id="quizPrompt">What does this mean?</div>
+      <div class="quiz-word" id="quizWord">—</div>
+      <div class="quiz-sub" id="quizSub"></div>
+    </div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()" style="display:none">Next Question →</button>
+  </section>
+
+  <!-- GRAMMAR -->
+
+  <section id="grammar" class="section">
+    <div class="section-title">📐 Key Grammar Rules</div>
+
+```
+<div class="grammar-block">
+  <h3>1. No Verb Tense Changes — Use Markers Instead</h3>
+  <p>Pidgin verbs never conjugate. Instead, use <strong>go</strong> (future), <strong>don</strong> (past/completed), <strong>dey</strong> (present continuous).</p>
+  <div class="example-row"><div class="ex-label">FUT</div><div><div class="ex-text">I <strong>go</strong> chop later</div><div class="ex-en">I will eat later</div></div></div>
+  <div class="example-row"><div class="ex-label">PAST</div><div><div class="ex-text">She <strong>don</strong> go already</div><div class="ex-en">She has already gone</div></div></div>
+  <div class="example-row"><div class="ex-label">PROG</div><div><div class="ex-text">We <strong>dey</strong> wait for you</div><div class="ex-en">We are waiting for you</div></div></div>
+</div>
+
+<div class="grammar-block">
+  <h3>2. "Na" — The All-Purpose Emphasis Word</h3>
+  <p><strong>Na</strong> works as "is/are/it's/that's" — the most common word in Pidgin.</p>
+  <div class="example-row"><div class="ex-label">ID</div><div><div class="ex-text"><strong>Na</strong> me do am</div><div class="ex-en">It was me that did it</div></div></div>
+  <div class="example-row"><div class="ex-label">EQ</div><div><div class="ex-text"><strong>Na</strong> your food be this</div><div class="ex-en">This is your food</div></div></div>
+</div>
+
+<div class="grammar-block">
+  <h3>3. Pronouns Don't Change for Object</h3>
+  <p>Same form for subject and object. <strong>I/me → I</strong>, <strong>he/him → am</strong>, <strong>they/them → dem</strong>.</p>
+  <div class="example-row"><div class="ex-label">EX</div><div><div class="ex-text">Tell <strong>am</strong> make <strong>e</strong> come</div><div class="ex-en">Tell him to come</div></div></div>
+  <div class="example-row"><div class="ex-label">EX</div><div><div class="ex-text">I see <strong>dem</strong> for road</div><div class="ex-en">I saw them on the road</div></div></div>
+</div>
+
+<div class="grammar-block">
+  <h3>4. Questions with "Wetin / How / Who"</h3>
+  <p>Pidgin has its own question words: <strong>wetin</strong> (what), <strong>wey</strong> (which/that), <strong>abeg</strong> (please).</p>
+  <div class="example-row"><div class="ex-label">Q</div><div><div class="ex-text"><strong>Wetin</strong> you want?</div><div class="ex-en">What do you want?</div></div></div>
+  <div class="example-row"><div class="ex-label">Q</div><div><div class="ex-text">Where <strong>e</strong> dey?</div><div class="ex-en">Where is it?</div></div></div>
+</div>
+
+<div class="grammar-block">
+  <h3>5. "Sef" — Emphasis Particle</h3>
+  <p><strong>Sef</strong> adds emphasis, similar to "even" or "at all".</p>
+  <div class="example-row"><div class="ex-label">EX</div><div><div class="ex-text">I no know <strong>sef</strong></div><div class="ex-en">I don't even know</div></div></div>
+  <div class="example-row"><div class="ex-label">EX</div><div><div class="ex-text">E no make sense <strong>sef</strong></div><div class="ex-en">It doesn't make any sense at all</div></div></div>
+</div>
+```
+
+  </section>
+
+  <!-- CULTURE -->
+
+  <section id="culture" class="section">
+    <div class="section-title">🎺 Culture & Context</div>
+
+```
+<div class="culture-card">
+  <div class="emoji">🇳🇬</div>
+  <h3>What is Nigerian Pidgin?</h3>
+  <p>Nigerian Pidgin (Naijá) is an English-based creole spoken across Nigeria and parts of West Africa. It started as a trade language between English merchants and local populations in the 16th century and grew into a full creole with over 75 million speakers — Nigeria's true common tongue.</p>
+</div>
+
+<div class="culture-card">
+  <div class="emoji">🤝</div>
+  <h3>Greeting Culture</h3>
+  <p>Greetings are very important in Nigerian culture. Always greet elders first. "How you dey?" (How are you?) is used constantly — the expected reply is "I dey o!" or "Fine o!" The "o" at the end adds warmth and emphasis to everything.</p>
+  <div class="culture-example">"How body?" → "Body dey for cloth!" (Body is in clothes = I'm doing well!)</div>
+</div>
+
+<div class="culture-card">
+  <div class="emoji">🍛</div>
+  <h3>Food Words</h3>
+  <p><strong>Chop</strong> means eat or food. "Wetin we go chop?" (What shall we eat?) is a classic Nigerian question. Food is central to social life — never turn down food at someone's home.</p>
+  <div class="culture-example">"Come chop!" = Come and eat! (An invitation, not just a command)</div>
+</div>
+
+<div class="culture-card">
+  <div class="emoji">💰</div>
+  <h3>Money & Hustle</h3>
+  <p><strong>Egunje</strong> (bribe), <strong>hustle</strong> (working hard to survive), <strong>mugu</strong> (a gullible person/victim) are everyday words. Nigeria's entrepreneurial spirit is reflected in the language — everyone is hustling.</p>
+  <div class="culture-example">"E get as e be" = It is what it is (accepting life's hardships)</div>
+</div>
+
+<div class="culture-card">
+  <div class="emoji">🔥</div>
+  <h3>Popular Slang from Music</h3>
+  <p>Afrobeats artists like Burna Boy, Wizkid, and Davido have spread Pidgin globally. Words like <strong>odogwu</strong> (boss/champion), <strong>shayo</strong> (alcohol), and <strong>wahala</strong> (trouble/drama) are now heard worldwide.</p>
+  <div class="culture-example">"No cap, that song don mad o!" = No lie, that song is amazing!</div>
+</div>
+
+<div class="culture-card">
+  <div class="emoji">😄</div>
+  <h3>The Magic of "O"</h3>
+  <p>The particle <strong>o</strong> (sometimes written <em>oh</em>) is attached to phrases to add emotion — surprise, warning, plea, or emphasis. It has no direct English translation but makes speech feel warm and expressive.</p>
+  <div class="culture-example">"E don do o!" = It's over! (with finality)<br>"Abeg o!" = Please! (with urgency or desperation)</div>
+</div>
+```
+
+  </section>
+
+</main>
+
+<footer>Nigerian Pidgin · Naijá · West African Creole</footer>
+
+<script>
+const phrases = [
+  // Greetings
+  { pidgin: "How you dey?", english: "How are you?", notes: "The most common greeting. Reply: 'I dey o!' or 'Fine o!'", cat: "Greetings" },
+  { pidgin: "You don chop?", english: "Have you eaten?", notes: "A caring greeting — food is love in Nigerian culture.", cat: "Greetings" },
+  { pidgin: "How body?", english: "How's your body? (How are you?)", notes: "Reply: 'Body dey inside cloth!' (I'm doing fine!)", cat: "Greetings" },
+  { pidgin: "Weytin dey happen?", english: "What's happening?", notes: "Casual greeting among friends.", cat: "Greetings" },
+  { pidgin: "I dey o!", english: "I'm fine / I'm here!", notes: "Classic reply to any 'how are you' greeting.", cat: "Greetings" },
+  { pidgin: "E don do!", english: "It's over / Finished!", notes: "Can be good or bad depending on context.", cat: "Greetings" },
+
+  // Essentials
+  { pidgin: "Wetin be dat?", english: "What is that?", notes: "'Wetin' = What. Very common question word.", cat: "Essentials" },
+  { pidgin: "I no sabi", english: "I don't know", notes: "'Sabi' = to know/understand. From Portuguese 'saber'.", cat: "Essentials" },
+  { pidgin: "Abeg", english: "Please / I beg you", notes: "From 'I beg' — used constantly to soften requests.", cat: "Essentials" },
+  { pidgin: "Na so", english: "That's it / Exactly / I see", notes: "Versatile agreement word.", cat: "Essentials" },
+  { pidgin: "Oya!", english: "Let's go! / Come on! / Okay!", notes: "From Yoruba — used to signal action or agreement.", cat: "Essentials" },
+  { pidgin: "E don happen", english: "It has happened", notes: "'Don' marks completed action (past tense).", cat: "Essentials" },
+
+  // Food
+  { pidgin: "I wan chop", english: "I want to eat", notes: "'Chop' = eat/food. Very common word.", cat: "Food" },
+  { pidgin: "The food sweet well well", english: "The food is very delicious", notes: "'Well well' intensifies — 'very very'.", cat: "Food" },
+  { pidgin: "Abeg bring water", english: "Please bring water", notes: "Simple polite request.", cat: "Food" },
+  { pidgin: "I don chop finish", english: "I've finished eating", notes: "'Don...finish' = completed action.", cat: "Food" },
+
+  // Expressions
+  { pidgin: "No wahala!", english: "No problem / No worries!", notes: "'Wahala' = trouble/drama. Saying there's none.", cat: "Expressions" },
+  { pidgin: "Wahala dey o", english: "There is trouble / This is serious", notes: "The opposite — warning that things are serious.", cat: "Expressions" },
+  { pidgin: "You don try!", english: "You did well / Well done!", notes: "High praise — 'try' means to put in effort.", cat: "Expressions" },
+  { pidgin: "E no easy", english: "It's not easy / Life is hard", notes: "Often said with a sigh — acknowledging struggle.", cat: "Expressions" },
+  { pidgin: "Shine your eye", english: "Be careful / Stay alert", notes: "A warning to be vigilant, don't be naive.", cat: "Expressions" },
+  { pidgin: "I go beat you!", english: "I'll beat you up!", notes: "Often said jokingly between friends — not always a real threat!", cat: "Expressions" },
+  { pidgin: "E get as e be", english: "It is what it is", notes: "Philosophical acceptance of a situation.", cat: "Expressions" },
+  { pidgin: "How far?", english: "What's up? / How's it going?", notes: "Super casual greeting among young people.", cat: "Expressions" },
+
+  // Slang
+  { pidgin: "Odogwu", english: "Boss / Champion / Big man", notes: "High compliment — calling someone powerful or great.", cat: "Slang" },
+  { pidgin: "Mugu", english: "Fool / Gullible person", notes: "Someone easily deceived. Don't be a mugu!", cat: "Slang" },
+  { pidgin: "Shakara", english: "Showing off / Acting proud", notes: "Someone who is being vain or pretentious.", cat: "Slang" },
+  { pidgin: "Ginger", english: "To motivate / to hype up", notes: "'She don ginger me' = She has motivated me.", cat: "Slang" },
+  { pidgin: "Kolo", english: "Crazy / Mad", notes: "'That person don kolo' = That person has gone mad.", cat: "Slang" },
+  { pidgin: "Shayo", english: "Alcohol / To be drunk", notes: "From Yoruba. 'E don shayo' = He's drunk.", cat: "Slang" },
+];
+
+let currentCat = "All";
+let quizIndex = 0;
+let score = 0;
+let total = 0;
+let quizPool = [];
+let answered = false;
+
+// Build categories
+function buildCats() {
+  const cats = ["All", ...new Set(phrases.map(p => p.cat))];
+  const row = document.getElementById("catRow");
+  cats.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "cat-btn" + (c === "All" ? " active" : "");
+    btn.textContent = c;
+    btn.onclick = () => { currentCat = c; renderPhrases(); document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active")); btn.classList.add("active"); };
+    row.appendChild(btn);
+  });
+}
+
+function renderPhrases() {
+  const list = document.getElementById("phraseList");
+  const filtered = currentCat === "All" ? phrases : phrases.filter(p => p.cat === currentCat);
+  list.innerHTML = filtered.map((p, i) => `
+    <div class="phrase-card" onclick="this.classList.toggle('flip')">
+      <div class="tap-hint">tap to expand</div>
+      <div class="pidgin-text">${p.pidgin}</div>
+      <div class="english-text">${p.english}</div>
+      <div class="notes-text">💡 ${p.notes}</div>
+    </div>
+  `).join("");
+}
+
+// Quiz
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  quizPool = shuffleArray(phrases);
+  quizIndex = 0; score = 0; total = 0;
+  updateScore();
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("quizFeedback").textContent = "";
+  document.getElementById("quizFeedback").className = "quiz-feedback";
+
+  if (quizIndex >= quizPool.length) { quizIndex = 0; quizPool = shuffleArray(phrases); }
+
+  const q = quizPool[quizIndex];
+  const isP2E = Math.random() > 0.4; // pidgin → english or english → pidgin
+  
+  document.getElementById("quizPrompt").textContent = isP2E ? "What does this Pidgin phrase mean?" : "How do you say this in Pidgin?";
+  document.getElementById("quizWord").textContent = isP2E ? q.pidgin : q.english;
+  document.getElementById("quizSub").textContent = isP2E ? "" : "";
+
+  // Get 3 wrong answers
+  const wrongs = shuffleArray(phrases.filter(p => p !== q)).slice(0, 3);
+  const options = shuffleArray([q, ...wrongs]);
+
+  const container = document.getElementById("quizOptions");
+  container.innerHTML = options.map(opt => {
+    const label = isP2E ? opt.english : opt.pidgin;
+    const isCorrect = opt === q;
+    return `<button class="quiz-opt" onclick="checkAnswer(this, ${isCorrect}, '${q.pidgin.replace(/'/g,"\\'")}', '${q.english.replace(/'/g,"\\'")}', '${q.notes.replace(/'/g,"\\'")}', ${isP2E})">${label}</button>`;
+  }).join("");
+}
+
+function checkAnswer(btn, isCorrect, pidgin, english, notes, isP2E) {
+  if (answered) return;
+  answered = true; total++;
+
+  const buttons = document.querySelectorAll(".quiz-opt");
+  buttons.forEach(b => { b.disabled = true; });
+
+  if (isCorrect) {
+    btn.classList.add("correct");
+    score++;
+    document.getElementById("quizFeedback").textContent = "✅ Correct! " + (isP2E ? "" : `"${pidgin}"`);
+    document.getElementById("quizFeedback").className = "quiz-feedback correct-fb";
+  } else {
+    btn.classList.add("wrong");
+    // highlight correct
+    buttons.forEach(b => {
+      if (b.textContent === (isP2E ? english : pidgin)) b.classList.add("correct");
+    });
+    document.getElementById("quizFeedback").textContent = `❌ It's "${isP2E ? english : pidgin}" — ${notes}`;
+    document.getElementById("quizFeedback").className = "quiz-feedback wrong-fb";
+  }
+
+  updateScore();
+  document.getElementById("nextBtn").style.display = "block";
+}
+
+function nextQuestion() {
+  quizIndex++;
+  loadQuestion();
+}
+
+function updateScore() {
+  document.getElementById("scoreDisplay").textContent = score;
+  document.getElementById("totalDisplay").textContent = total;
+}
+
+function showTab(name) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById(name).classList.add("active");
+  event.target.classList.add("active");
+  if (name === "quiz") startQuiz();
+}
+
+// Init
+buildCats();
+renderPhrases();
+startQuiz();
+</script>
+
+</body>
+</html>
